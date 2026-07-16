@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>而立思路 | 入口</title>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+            background-color: #fcfcfc;
+            color: #2b2b2b;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .welcome-card {
+            text-align: center;
+            max-width: 520px;
+            padding: 50px 24px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 6px;
+            margin-bottom: 25px;
+            color: #111;
+        }
+        .subtitle {
+            font-size: 0.95rem;
+            color: #555;
+            letter-spacing: 1.5px;
+            margin-bottom: 50px;
+            line-height: 2;
+            text-align: justify;
+            text-justify: inter-ideograph;
+        }
+        .subtitle p {
+            margin-bottom: 1.5em;
+        }
+        .menu-title {
+            font-size: 0.8rem;
+            color: #bbb;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+        .choice-btn {
+            display: block;
+            width: 100%;
+            background: none;
+            border: 1px solid #ddd;
+            padding: 16px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            color: #444;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .choice-btn:hover {
+            border-color: #c7a17a;
+            color: #c7a17a;
+            background-color: #fffdfa;
+            transform: translateY(-2px);
+        }
+        .sub-panel {
+            display: none;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+        .sub-panel-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-top: 15px;
+            letter-spacing: 1px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="welcome-card">
+    <div id="main-panel">
+        <h1>而立思路</h1>
+        <div class="subtitle">
+            <p>嗨，我是溫蒂思。</p>
+            <p>今年迎來非常有紀念性的30歲生日，我想送給自己一份禮物。那就是把過往留下的文字軌跡，做成一本可以實體翻閱的小札記。</p>
+            <p>做為一個對文字很錙銖必較的人，再年少一點甚至會字斟句酌，在意對仗工整與隱喻暗喻。我知道每個文字都留有我的心眼，我選擇的辭彙都有我當時的深意。很多時候那是我與自己的秘密。</p>
+            <p>我想把這些文字整理起來，給自己做成一本書，那個小時候想要出書的心願，由我替自己完成。</p>
+            <p>《而立思路》收錄我從18歲離家上大學，一路到30歲的生命軌跡。「思」字，是我在2022年，為自己多加上的一個字，原為 Wendy，現在是Wendis，溫蒂思，溫蒂持續思考生命中。</p>
+            <p>這個生日計畫將會跨幅我的整個三十歲，歡迎你跟我一起在這回憶漩渦中時光旅行吧！</p>
+        </div>
+        
+        <div class="menu-title">— 漫遊路徑 —</div>
+        
+        <button class="choice-btn" onclick="showPanel('category-panel')">按主題章節閱讀</button>
+        <button class="choice-btn" onclick="showPanel('year-panel')">按發文時間年份</button>
+        <button class="choice-btn" onclick="goToRandom()">隨機呈現一篇文章</button>
+    </div>
+
+    <div id="category-panel" class="sub-panel">
+        <div class="menu-title">選擇主題章節</div>
+        <div class="sub-panel-grid" id="category-grid"></div>
+        <button class="back-btn" onclick="showPanel('main-panel')">← 返回主選單</button>
+    </div>
+
+    <div id="year-panel" class="sub-panel">
+        <div class="menu-title">選擇時光年份</div>
+        <div class="sub-panel-grid" id="year-grid"></div>
+        <button class="back-btn" onclick="showPanel('main-panel')">← 返回主選單</button>
+    </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+    const categories = [...new Set(articles.map(a => a.category))];
+    const years = [...new Set(articles.map(a => a.year))].sort((a,b) => b - a);
+
+    const catGrid = document.getElementById('category-grid');
+    categories.forEach(cat => {
+        const firstArticle = articles.find(a => a.category === cat);
+        if(firstArticle) {
+            catGrid.innerHTML += `<button class="choice-btn" style="padding: 10px; margin:0;" onclick="goToArticle(${firstArticle.id})">${cat}</button>`;
+        }
+    });
+
+    const yearGrid = document.getElementById('year-grid');
+    years.forEach(yr => {
+        const firstArticle = articles.find(a => a.year === yr);
+        if(firstArticle) {
+            yearGrid.innerHTML += `<button class="choice-btn" style="padding: 10px; margin:0;" onclick="goToArticle(${firstArticle.id})">${yr} 年</button>`;
+        }
+    });
+
+    function showPanel(panelId) {
+        document.querySelectorAll('.welcome-card > div').forEach(p => p.style.display = 'none');
+        document.getElementById(panelId).style.display = 'block';
+    }
+
+    function goToArticle(id) {
+        window.location.href = `article.html?id=${id}`;
+    }
+
+    function goToRandom() {
+        const randomId = Math.floor(Math.random() * articles.length);
+        goToArticle(randomId);
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>而立思路 | 閱讀</title>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+            background-color: #fcfcfc;
+            color: #2b2b2b;
+            line-height: 1.9;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .nav-home-btn {
+            text-decoration: none;
+            color: #888;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            transition: color 0.2s;
+        }
+        .nav-home-btn:hover {
+            color: #c7a17a;
+        }
+        .post-meta {
+            font-size: 0.85rem;
+            color: #999;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .post-category {
+            background-color: #f0f0f0;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            color: #666;
+            letter-spacing: 1px;
+        }
+        .post-content {
+            font-size: 1.05rem;
+            white-space: pre-wrap;
+            text-align: justify;
+            letter-spacing: 0.5px;
+            margin-bottom: 50px;
+        }
+        
+        /* 🧭 上一篇/下一篇導覽區 */
+        .navigation-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0;
+            padding-top: 20px;
+            border-top: 1px dashed #eee;
+        }
+        .nav-link-btn {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #666;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+        }
+        .nav-link-btn:hover:not(:disabled) {
+            border-color: #c7a17a;
+            color: #c7a17a;
+            background-color: #fffdfa;
+        }
+        .nav-link-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* 💬 時光對話留言板 */
+        .comment-section {
+            background-color: #fafafa;
+            border-radius: 8px;
+            padding: 24px;
+            margin-top: 40px; /* 稍微推開一些距離，更有呼吸感 */
+        }
+        .comment-section h4 {
+            margin: 0 0 15px 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #555;
+            letter-spacing: 2px;
+        }
+        
+        .comment-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .comment-input {
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            background-color: #fff;
+            outline: none;
+        }
+        .comment-author-input {
+            max-width: 250px; /* 加寬暱稱欄，讓「經過這則回憶的你是...」顯示更完整 */
+        }
+        .comment-text-row {
+            display: flex;
+            gap: 10px;
+        }
+        .comment-text-input {
+            flex: 1;
+        }
+        .comment-submit {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        .comment-submit:hover {
+            background-color: #555;
+        }
+        .comments-list {
+            font-size: 0.85rem;
+            color: #555;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        .comment-item {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f9f9f9;
+        }
+        .comment-author {
+            font-weight: bold;
+            color: #333;
+            margin-right: 5px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 1px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 80px;
+            font-size: 0.8rem;
+            color: #aaa;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="nav-header">
+        <a href="index.html" class="nav-home-btn">← 回《而立思路》入口</a>
+        <span style="font-size: 0.8rem; color: #bbb;" id="page-indicator">1 / 1</span>
+    </header>
+
+    <main>
+        <article>
+            <div class="post-meta">
+                <time id="post-date">2026-01-01</time>
+                <span class="post-category" id="post-category">未分類</span>
+            </div>
+            <div class="post-content" id="post-content">
+                加載中...
+            </div>
+        </article>
+
+        <div class="navigation-row">
+            <button class="nav-link-btn" id="prev-btn" onclick="navigate(-1)">← 上一篇</button>
+            <button class="nav-link-btn" id="next-btn" onclick="navigate(1)">下一篇 →</button>
+        </div>
+
+        <section>
+            <div class="comment-section">
+                <h4>時 光 對 話</h4>
+                
+                <div class="comment-input-group">
+                    <input type="text" class="comment-input comment-author-input" id="comment-author" placeholder="經過這則回憶的你是...">
+                    <div class="comment-text-row">
+                        <input type="text" class="comment-input comment-text-input" id="comment-text" placeholder="留給當時或此刻的溫蒂思...">
+                        <button class="comment-submit" onclick="addComment()">送出時光膠囊</button>
+                    </div>
+                </div>
+                
+                <div class="comments-list" id="comments-box">
+                    <!-- 留言會動態渲染在這裡 -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 而立思路．溫蒂思的三十歲生日計畫</p>
+    </footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    let currentId = parseInt(urlParams.get('id')) || 0;
+
+    if (currentId < 0) currentId = 0;
+    if (currentId >= articles.length) currentId = articles.length - 1;
+
+    function renderArticle() {
+        const article = articles[currentId];
+        document.getElementById('post-date').innerText = article.date;
+        document.getElementById('post-category').innerText = article.category;
+        document.getElementById('post-content').innerText = article.content;
+        document.getElementById('page-indicator').innerText = `${currentId + 1} / ${articles.length}`;
+
+        document.getElementById('prev-btn').disabled = (currentId === 0);
+        document.getElementById('next-btn').disabled = (currentId === articles.length - 1);
+
+        loadComments();
+    }
+
+    function navigate(direction) {
+        currentId += direction;
+        window.history.pushState(null, '', `article.html?id=${currentId}`);
+        renderArticle();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function loadComments() {
+        const box = document.getElementById('comments-box');
+        box.innerHTML = '';
+        
+        const localKey = `comments_article_${currentId}`;
+        const savedComments = JSON.parse(localStorage.getItem(localKey)) || [];
+        
+        // 預設一筆暖心預設留言
+        if (savedComments.length === 0) {
+            savedComments.push({
+                author: "時光旅人",
+                text: "謝謝你，陪我走過一段又一段的青春。"
+            });
+        }
+
+        savedComments.forEach(c => {
+            box.innerHTML += `
+                <div class="comment-item">
+                    <span class="comment-author">✏️ ${c.author}</span>：${c.text}
+                </div>
+            `;
+        });
+    }
+
+    function addComment() {
+        const authorInput = document.getElementById('comment-author');
+        const input = document.getElementById('comment-text');
+        
+        const authorName = authorInput.value.trim() || "匿名旅人";
+        const text = input.value.trim();
+        
+        if (!text) return;
+
+        const localKey = `comments_article_${currentId}`;
+        const savedComments = JSON.parse(localStorage.getItem(localKey)) || [];
+        
+        savedComments.push({
+            author: authorName,
+            text: text
+        });
+
+        localStorage.setItem(localKey, JSON.stringify(savedComments));
+        
+        input.value = '';
+        loadComments();
+    }
+
+    renderArticle();
+</script>
+
+</body>
+</html>
