@@ -230,9 +230,9 @@
 
     // 🎯 這是妳的 Google 表單發送設定
     const FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdTTrECwiBzlc7PkcHmdnLw2qlBRe44jInCNhS2rk8NAnkZOg/formResponse";
-    const ENTRY_POST_ID = "entry.1022656127";   // 欄位：文章日期與主題
-    const ENTRY_AUTHOR = "entry.16281366";       // 欄位：經過這則回憶的你是...
-    const ENTRY_COMMENT = "entry.2091216676";    // 欄位：悄悄話留言內容
+    const ENTRY_POST_ID = "entry.1022656127";   
+    const ENTRY_AUTHOR = "entry.16281366";       
+    const ENTRY_COMMENT = "entry.2091216676";    
 
     function renderArticle() {
         const article = articles[currentId];
@@ -277,7 +277,6 @@
         });
     }
 
-    // 🚀 當按下送出時，同時寫入瀏覽器快取，並在背景發送給 Google 表單後台
     function addComment() {
         const authorInput = document.getElementById('comment-author');
         const input = document.getElementById('comment-text');
@@ -288,33 +287,33 @@
         
         if (!text) return;
 
-        // 鎖定送出按鈕防止重複點擊
         submitBtn.disabled = true;
         submitBtn.innerText = "封存中...";
 
         const currentArticle = articles[currentId];
-        // 識別文章的字串組合：例如 "2018-10-12 [感情]"
         const postIdentifier = `${currentArticle.date} [${currentArticle.category}]`;
 
-        // --- 1. 背景傳送至 Google 表單後台 ---
-        const formData = new FormData();
-        formData.append(ENTRY_POST_ID, postIdentifier);
-        formData.append(ENTRY_AUTHOR, authorName);
-        formData.append(ENTRY_COMMENT, text);
+        // 💡 【修正重點】使用 URLSearchParams 進行網址參數格式打包，確保 Google Form 能讀懂它！
+        const params = new URLSearchParams();
+        params.append(ENTRY_POST_ID, postIdentifier);
+        params.append(ENTRY_AUTHOR, authorName);
+        params.append(ENTRY_COMMENT, text);
 
         fetch(FORM_ACTION_URL, {
             method: 'POST',
-            mode: 'no-cors', // 避開跨網域 CROS 限制
-            body: formData
+            mode: 'no-cors', 
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded' // 告訴 Google：我們是用網址參數傳過來的唷！
+            },
+            body: params
         })
         .then(() => {
             console.log("時光膠囊已安全傳入後台！");
         })
         .catch((error) => {
-            console.error("傳送時發生異常，但我們仍會先顯示在畫面上：", error);
+            console.error("傳送時發生異常：", error);
         });
 
-        // --- 2. 同步儲存至本地快取，給讀者即時回饋 ---
         const localKey = `comments_article_${currentId}`;
         const savedComments = JSON.parse(localStorage.getItem(localKey)) || [];
         
@@ -325,13 +324,12 @@
 
         localStorage.setItem(localKey, JSON.stringify(savedComments));
         
-        // 恢復按鈕狀態，並清空留言內容框
         setTimeout(() => {
             input.value = '';
             submitBtn.disabled = false;
             submitBtn.innerText = "送出時光膠囊";
             loadComments();
-        }, 600); // 稍微延遲一下，呈現精美的封存感
+        }, 600); 
     }
 
     renderArticle();
