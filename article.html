@@ -60,7 +60,6 @@
             margin-bottom: 50px;
         }
         
-        /* 🧭 上一篇/下一篇導覽區 */
         .navigation-row {
             display: flex;
             justify-content: space-between;
@@ -89,12 +88,11 @@
             cursor: not-allowed;
         }
 
-        /* 💬 時光對話留言板 */
         .comment-section {
             background-color: #fafafa;
             border-radius: 8px;
             padding: 24px;
-            margin-top: 40px; /* 稍微推開一些距離，更有呼吸感 */
+            margin-top: 40px;
         }
         .comment-section h4 {
             margin: 0 0 15px 0;
@@ -119,7 +117,7 @@
             outline: none;
         }
         .comment-author-input {
-            max-width: 250px; /* 加寬暱稱欄，讓「經過這則回憶的你是...」顯示更完整 */
+            max-width: 250px;
         }
         .comment-text-row {
             display: flex;
@@ -139,8 +137,12 @@
             transition: background-color 0.2s;
             white-space: nowrap;
         }
-        .comment-submit:hover {
+        .comment-submit:hover:not(:disabled) {
             background-color: #555;
+        }
+        .comment-submit:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
         .comments-list {
             font-size: 0.85rem;
@@ -203,13 +205,12 @@
                     <input type="text" class="comment-input comment-author-input" id="comment-author" placeholder="經過這則回憶的你是...">
                     <div class="comment-text-row">
                         <input type="text" class="comment-input comment-text-input" id="comment-text" placeholder="留給當時或此刻的溫蒂思...">
-                        <button class="comment-submit" onclick="addComment()">送出時光膠囊</button>
+                        <button class="comment-submit" id="submit-btn" onclick="addComment()">送出時光膠囊</button>
                     </div>
                 </div>
                 
                 <div class="comments-list" id="comments-box">
-                    <!-- 留言會動態渲染在這裡 -->
-                </div>
+                    </div>
             </div>
         </section>
     </main>
@@ -226,6 +227,12 @@
 
     if (currentId < 0) currentId = 0;
     if (currentId >= articles.length) currentId = articles.length - 1;
+
+    // 🎯 這是妳的 Google 表單發送設定
+    const FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdTTrECwiBzlc7PkcHmdnLw2qlBRe44jInCNhS2rk8NAnkZOg/formResponse";
+    const ENTRY_POST_ID = "entry.1022656127";   // 欄位：文章日期與主題
+    const ENTRY_AUTHOR = "entry.16281366";       // 欄位：經過這則回憶的你是...
+    const ENTRY_COMMENT = "entry.2091216676";    // 欄位：悄悄話留言內容
 
     function renderArticle() {
         const article = articles[currentId];
@@ -254,7 +261,6 @@
         const localKey = `comments_article_${currentId}`;
         const savedComments = JSON.parse(localStorage.getItem(localKey)) || [];
         
-        // 預設一筆暖心預設留言
         if (savedComments.length === 0) {
             savedComments.push({
                 author: "時光旅人",
@@ -271,15 +277,44 @@
         });
     }
 
+    // 🚀 當按下送出時，同時寫入瀏覽器快取，並在背景發送給 Google 表單後台
     function addComment() {
         const authorInput = document.getElementById('comment-author');
         const input = document.getElementById('comment-text');
+        const submitBtn = document.getElementById('submit-btn');
         
         const authorName = authorInput.value.trim() || "匿名旅人";
         const text = input.value.trim();
         
         if (!text) return;
 
+        // 鎖定送出按鈕防止重複點擊
+        submitBtn.disabled = true;
+        submitBtn.innerText = "封存中...";
+
+        const currentArticle = articles[currentId];
+        // 識別文章的字串組合：例如 "2018-10-12 [感情]"
+        const postIdentifier = `${currentArticle.date} [${currentArticle.category}]`;
+
+        // --- 1. 背景傳送至 Google 表單後台 ---
+        const formData = new FormData();
+        formData.append(ENTRY_POST_ID, postIdentifier);
+        formData.append(ENTRY_AUTHOR, authorName);
+        formData.append(ENTRY_COMMENT, text);
+
+        fetch(FORM_ACTION_URL, {
+            method: 'POST',
+            mode: 'no-cors', // 避開跨網域 CROS 限制
+            body: formData
+        })
+        .then(() => {
+            console.log("時光膠囊已安全傳入後台！");
+        })
+        .catch((error) => {
+            console.error("傳送時發生異常，但我們仍會先顯示在畫面上：", error);
+        });
+
+        // --- 2. 同步儲存至本地快取，給讀者即時回饋 ---
         const localKey = `comments_article_${currentId}`;
         const savedComments = JSON.parse(localStorage.getItem(localKey)) || [];
         
@@ -290,8 +325,13 @@
 
         localStorage.setItem(localKey, JSON.stringify(savedComments));
         
-        input.value = '';
-        loadComments();
+        // 恢復按鈕狀態，並清空留言內容框
+        setTimeout(() => {
+            input.value = '';
+            submitBtn.disabled = false;
+            submitBtn.innerText = "送出時光膠囊";
+            loadComments();
+        }, 600); // 稍微延遲一下，呈現精美的封存感
     }
 
     renderArticle();
